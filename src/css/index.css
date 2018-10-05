@@ -5,3 +5,28 @@ body {
   padding: 0;
   font-family: 'Montserrat', Helvetica, sans-serif;
 }
+
+.navigation {
+  display: flex;
+  list-style: none;
+  flex-direction: row;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.navigation li {
+  display: list-item;
+}
+
+.navigation li a {
+  color: rgba(255,255,255,0.5);
+}
+
+.navigation li a:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+.right {
+  position: absolute;
+  right: 0;
+}

@@ -4,7 +4,6 @@ import logo from '../img/logo.svg'
 import '../css/App.css'
 import * as firebase from 'firebase'
 
-import Ola from './Ola'
 import TrackInfo from './TrackInfo'
 import Navigation from './navigation'
 import HomePage from './home'
@@ -57,7 +56,6 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <Ola name='Diogo' /><br />
         and I'm the fastest man alive, checkou my speed = {this.state.speed}
         <TrackInfo />
       </div>

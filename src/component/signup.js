@@ -7,7 +7,7 @@ const SignUpPage = () =>
     <h1>SignUp Page</h1>
     <div className='row'>
       <div className='col'></div>
-      <div className='col-5'>
+      <div className='col-sm-12 col-md-8 col-lg-10'>
         <SignUpForm />
       </div>
       <div className='col'></div>
@@ -52,8 +52,8 @@ class SignUpForm extends Component {
 
         <div className='form-group'>
           <div className='row justify-content-md-around'>
-            <button className='btn btn-primary btn-lg col-4' type='submit'>Sign Up</button>
-            <button className='btn btn-danger btn-lg col-4' type='reset'>Reset</button>
+            <button className='btn btn-primary btn-lg col' type='submit'>Sign Up</button>
+            <button className='btn btn-danger btn-lg col' type='reset'>Reset</button>
           </div>
         </div>
       </form>
