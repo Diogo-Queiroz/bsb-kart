@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 
 import { SignUpLink } from './signup'
-import { auth } from '../firebase'
-import * as routes from '../constants/routes'
+import { PasswordForgetLink } from '../password-methods/pass-forget'
+import { auth } from '../../firebase'
+import * as routes from '../../constants/routes'
 
 const SignInPage = ({ history }) =>
   <div className='container'>
@@ -12,6 +13,7 @@ const SignInPage = ({ history }) =>
       <div className='col'></div>
       <div className='col-sm-12 col-md-8 col-lg-10'>
         <SignInForm history={history} />
+        <PasswordForgetLink />
         <SignUpLink />
       </div>
     </div>
@@ -86,7 +88,7 @@ class SignInForm extends Component {
           <div className='row justify-content-md-around'>
             <button 
               className='btn btn-primary btn-lg col'
-              type='submit' disabled={isInvalid}>Sign Up
+              type='submit' disabled={isInvalid}>Sign In
             </button>
             <button className='btn btn-danger btn-lg col' type='reset'>Reset</button>
           </div>
@@ -97,6 +99,12 @@ class SignInForm extends Component {
   }
 }
 
+const SignInLink = () =>
+  <p>
+    Already have an account?
+    <Link to={routes.SIGN_IN}>Sign In Here</Link>
+  </p>
+
 export default withRouter(SignInPage)
 
-export { SignInForm }
+export { SignInForm, SignInLink }

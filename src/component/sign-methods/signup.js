@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-import { auth } from '../firebase'
-import * as routes from '../constants/routes'
+import { auth } from '../../firebase'
+import * as routes from '../../constants/routes'
+import { SignInLink } from './signin'
+
 // Object representing the initial state of this component
 const INITIAL_STATE = {
   username: '',
@@ -22,6 +24,7 @@ const SignUpPage = ({ history }) =>
       </div>
       <div className='col'></div>
     </div>
+    <SignInLink />
   </div>
 
 const byPropKey = (propertyKey, value) => () => ({
@@ -125,7 +128,7 @@ class SignUpForm extends Component {
 
 const SignUpLink = () =>
   <p>
-    Don't have an account??
+    Don't have an account?? 
     <Link to={routes.SIGN_UP}>Sign Up</Link>
   </p>
 
