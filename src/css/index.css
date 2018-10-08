@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:500i');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:500i|Poppins');
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Montserrat', Helvetica, sans-serif;
+  font-family: 'Poppins', 'Montserrat', Helvetica, sans-serif;
 }
 
 .navigation {
