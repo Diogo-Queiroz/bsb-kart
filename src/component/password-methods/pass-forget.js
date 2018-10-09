@@ -8,8 +8,14 @@ import { SignUpLink } from '../sign-methods/signup'
 const PasswordForgetPage = () =>
   <div className='container'>
     <h1>Password Forget Page</h1>
-    <PasswordForgetForm />
-    <SignUpLink />
+    <div className='row'>
+      <div className='col'></div>
+      <div className='col-sm-12 col-md-8 col-lg-6'>
+        <PasswordForgetForm />
+        <SignUpLink />
+      </div>
+      <div className='col'></div>
+    </div>
   </div>
 
 const INITIAL_STATE = {

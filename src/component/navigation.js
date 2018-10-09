@@ -29,6 +29,9 @@ const NavigationAuth = () =>
         <li>
           <Link className='nav-item nav-link' to={routes.ACCOUNT}>Account</Link>
         </li>
+        <li>
+          <Link className='nav-item nav-link' to={routes.MOVIES}>Movies</Link>
+        </li>
       </ul>
     </div>
     <div className='right'>
