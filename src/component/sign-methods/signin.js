@@ -11,11 +11,13 @@ const SignInPage = ({ history }) =>
     <h1>SignIn Page</h1>
     <div className='row'>
       <div className='col'></div>
-      <div className='col-sm-12 col-md-8 col-lg-10'>
+      <div className='col-sm-12 col-md-8 col-lg-6'>
+      
         <SignInForm history={history} />
         <PasswordForgetLink />
         <SignUpLink />
       </div>
+      <div className='col'></div>
     </div>
   </div>
 

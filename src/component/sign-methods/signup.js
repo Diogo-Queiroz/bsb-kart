@@ -19,7 +19,7 @@ const SignUpPage = ({ history }) =>
     <h1>SignUp Page</h1>
     <div className='row'>
       <div className='col'></div>
-      <div className='col-sm-12 col-md-8 col-lg-10'>
+      <div className='col-sm-12 col-md-8 col-lg-6'>
         <SignUpForm history={history} />
       </div>
       <div className='col'></div>
