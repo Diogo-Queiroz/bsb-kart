@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import logo from '../img/logo.svg'
 import '../css/App.css'
-import { firebase } from '../firebase' // Para Deletar
 
 import withAuthentication from './withAuthentication'
 

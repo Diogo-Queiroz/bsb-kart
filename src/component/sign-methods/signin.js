@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 
+import firebase from 'firebase/app'
+
 import { SignUpLink } from './signup'
 import { PasswordForgetLink } from '../password-methods/pass-forget'
-import { auth } from '../../firebase'
+import { auth, googleprovider } from '../../firebase'
 import * as routes from '../../constants/routes'
+import { GoogleLogin } from '../../firebase/google-auth';
 
 const SignInPage = ({ history }) =>
   <div className='container'>
@@ -14,6 +17,7 @@ const SignInPage = ({ history }) =>
       <div className='col-sm-12 col-md-8 col-lg-6'>
       
         <SignInForm history={history} />
+        <GoogleLoginButton />
         <PasswordForgetLink />
         <SignUpLink />
       </div>
@@ -28,7 +32,8 @@ const byPropKey = (propertyName, value) => () => ({
 const INITIAL_STATE = {
   email: '',
   password: '',
-  error: null
+  error: null,
+  provider: googleprovider
 }
 
 class SignInForm extends Component {
@@ -97,6 +102,37 @@ class SignInForm extends Component {
         </div>
         { error && <p>{ error.message }</p>}
       </form>
+    )
+  }
+}
+
+class GoogleLoginButton extends Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {...INITIAL_STATE}
+  }
+
+  submitGoogle = () => {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        console.log(result)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
+  render () {
+    const { googleprovider } = this.state
+    return (
+      <button 
+        className='btn btn-default btn-lg col'
+        type='submit'
+        onClick={this.submitGoogle}>
+          Login with Google
+      </button>
     )
   }
 }
