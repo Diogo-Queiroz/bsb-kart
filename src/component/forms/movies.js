@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
 import { firebase } from '../../firebase/firebase'
-import { dbRef, dbMovieRef } from '../../firebase/database'
+import { dbRef, dbMovieRef, onceGetMovies } from '../../firebase/database'
 
 class MovieForm extends Component {
   constructor (props) {
@@ -70,9 +70,11 @@ class MovieForm extends Component {
               <textarea className='form-control' id='comments' rows='4' ref='comments'></textarea>
             </div>
           </div>
-          <div className='btn-group'>
-            <button type='submit' className='btn btn-primary'>Submit</button>
-            <button type='reset' className='btn btn-danger'>Cancel</button>
+          <div className='form-group'>
+            <div className='row justify-content-md-around'>
+              <button type='submit' className='btn btn-primary btn-lg col'>Submit</button>
+              <button type='reset' className='btn btn-danger btn-lg col'>Cancel</button>
+            </div>
           </div>
         </form>
       </div>
@@ -85,6 +87,7 @@ class MovieList extends Component {
     super(props)
     
     this.state = {
+      isLoading: false,
       movieList: [],
       visibleList: false
     }
@@ -95,12 +98,14 @@ class MovieList extends Component {
   getMovieList () {
     let newMovies = []
     dbMovieRef.on('child_added', (snapshot) => {
+      let data = snapshot.val()
+      console.log(data)
       let item = {
-        name: snapshot.val().name,
-        category: snapshot.val().category,
-        date: snapshot.val().date,
-        situation: snapshot.val().situation,
-        comments: snapshot.val().comments
+        name: data.name,
+        category: data.category,
+        date: data.date,
+        situation: data.situation,
+        comments: data.comments
       }
       newMovies.push(item)
     })
@@ -110,11 +115,36 @@ class MovieList extends Component {
   }
   
   componentDidMount () {
+    this.setState({
+      isLoading: true
+    })
     console.log('component did mount')
+    onceGetMovies().then(snapshot => {
+      let data = snapshot.val()
+      let item = []
+      console.log(data)
+      console.log(typeof(data))
+      console.log(Object.keys(data))
+      Object.keys(data).forEach((key) => {
+        console.log(key, data[key])
+        item.push({
+          name: data[key].name,
+          category: data[key].category,
+          situation: data[key].situation,
+          comments: data[key].comments
+        })
+      })
+      this.setState({
+        isLoading: false,
+        movieList: item
+      })}
+    )
+    console.log(this.state.movieList)
   }
   
   componentWillUpdate () {
     console.log('component will update')
+    console.log(this.state.movieList)
   }
   
   componentDidUpdate () {
@@ -131,12 +161,37 @@ class MovieList extends Component {
     })
   }
   
+  renderMovies (movies) {
+    return (
+      <div className='col-sm-6' style={{marginBottom: 10 + 'px'}}>
+        <div key={movies.name} className="card">
+          <img className="card-img-top" src="" alt="Card image cap" />
+          <div className="card-body">
+            <h5 className="card-title">{movies.name}</h5>
+            <p className="card-text">{movies.comments}</p>
+            <p className="card-text">{movies.category} - {movies.situation}</p>
+            <div className='row'>
+              <a href="#" className="btn btn-primary col">Edit</a>
+              <a href="#" className="btn btn-danger col">Delete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render () {
     return (
       <div>
         MovieList
-        {!!this.state.visibleList && <p>{this.state.movieList[0]}</p>}
+        {this.state.isLoading && <p>Carregando, aguarde...</p>}
+        <div className='row'>
+          {(this.state.movieList.length !== 0 && !this.state.isLoading) &&
+            this.state.movieList.map(this.renderMovies)
+          }
+        </div>
         <button onClick={this.toogleMovieList}>Show/Hide MovieList</button>
+        <button onClick={this.getMovieList}>Refresh</button>
       </div>
     )
   }

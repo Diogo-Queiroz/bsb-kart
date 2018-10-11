@@ -1,4 +1,5 @@
-import { db } from './firebase'
+import { database } from './firebase'
 
-export const dbRef = db.ref()
-export const dbMovieRef = db.ref('/movies')
+export const dbRef = database.ref()
+export const dbMovieRef = database.ref('/movies')
+export const onceGetMovies = () => database.ref('/movies').once('value')
