@@ -12,7 +12,8 @@ class MovieForm extends Component {
     this.state = {
       list: [],
       file: '',
-      imagePreviewURL: ''
+      imagePreviewURL: '',
+      error: ''
     }
 
     this.submitForm = this.submitForm.bind(this)
@@ -21,26 +22,35 @@ class MovieForm extends Component {
 
   submitForm (e) {
     e.preventDefault()
+    this.setState({ error: '' })
     let Data = new Date()
-    let infos = {
-      date: Data.toLocaleDateString(),
-      name: this.refs.name.value.trim(),
-      category: this.refs.category.value.trim(),
-      situation: this.refs.situation.value.trim(),
-      comments: this.refs.comments.value.trim(),
-      user: this.props.authUser.email
-    }
     let img = this.state.file
-    dbRef.child('movies').push(infos)
+    let fullPath = 'imagens/'+this.state.file.name
     console.log(img)
-    let fullPath = '/imagens/'+this.state.file.name
     console.log(fullPath)
     console.log(imgsRef.fullPath)
     if (!!img) {
-      imgsRef.parent.child('imagens/').child(img.name).put(img).then((result) => {
+      imgsRef.child(img.name).put(img).then((result) => {
         console.log('Uploaded -> ', result)
+        console.log('bucket -> ', result.ref.bucket)
+        console.log('fullPath -> ', result.ref.fullPath)
+        let downloadPath = 'gs://'+result.ref.bucket+'/'+result.ref.fullPath
+        console.log(downloadPath)
+        let infos = {
+          date: Data.toLocaleDateString(),
+          name: this.refs.name.value.trim(),
+          category: this.refs.category.value.trim(),
+          situation: this.refs.situation.value.trim(),
+          comments: this.refs.comments.value.trim(),
+          user: this.props.authUser.email,
+          imgUrl: downloadPath
+        }
+        dbRef.child('movies').push(infos)
       }).catch((error) => {
         console.log('Error -> ', error)
+        this.setState({
+          error: 'Error'
+        })
       })
     }
   }
@@ -105,7 +115,7 @@ class MovieForm extends Component {
           <div className='form-group row'>
             <label htmlFor='selectFile' className={style.colLabel}>Select File</label>
             <div className={style.colInput}>
-              <input type='file' id='output' onChange={(e) => this.loadPreview(e)}/>
+              <input type='file' id='output' onChange={(e) => this.loadPreview(e)} ref='img-file' required/>
               {!!this.state.file && 
                 <img id='output' src={this.state.imagePrevewURL} className='img-thumbnail' />
               }
@@ -118,6 +128,7 @@ class MovieForm extends Component {
               <button type='reset' className='btn btn-danger btn-lg col'>Cancel</button>
             </div>
           </div>
+          {!!this.state.error && <p>Erro, tente novamente...</p>}
         </form>
       </div>
     )
@@ -147,7 +158,8 @@ class MovieList extends Component {
         category: data.category,
         date: data.date,
         situation: data.situation,
-        comments: data.comments
+        comments: data.comments,
+        imgUrl: data.imgUrl
       }
       newMovies.push(item)
     })
@@ -173,7 +185,8 @@ class MovieList extends Component {
           name: data[key].name,
           category: data[key].category,
           situation: data[key].situation,
-          comments: data[key].comments
+          comments: data[key].comments,
+          imgUrl: (data[key].imgUrl) ? data[key].imgUrl : ''
         })
       })
       this.setState({
@@ -205,9 +218,9 @@ class MovieList extends Component {
   
   renderMovies (movies) {
     return (
-      <div className='col-sm-6' style={{marginBottom: 10 + 'px'}}>
+      <div key={movies.name} className='col-sm-12 col-md-6 col-lg-4 col-xl-3' style={{marginBottom: 10 + 'px'}}>
         <div key={movies.name} className="card">
-          <img className="card-img-top" src="" alt="Card image cap" />
+          <img className="card-img-top" src={movies.imgUrl} alt="Card image cap" />
           <div className="card-body">
             <h5 className="card-title">{movies.name}</h5>
             <p className="card-text">{movies.comments}</p>
