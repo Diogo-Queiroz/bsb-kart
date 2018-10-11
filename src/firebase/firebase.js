@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
+import 'firebase/storage'
 
 const prodConfig = {
   apiKey: 'AIzaSyDHUybkHc15uMHwMg5LXKYafoJ7qJDT-Hw',
@@ -32,8 +33,12 @@ const auth = firebase.auth()
 const googleProvider = new firebase.auth.GoogleAuthProvider()
 const database = firebase.database()
 
+// get a reference to the storage service
+const storage = firebase.storage()
+
 export {
   auth,
   googleProvider,
-  database
+  database,
+  storage
 }

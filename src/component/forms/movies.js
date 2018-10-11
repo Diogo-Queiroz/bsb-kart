@@ -3,16 +3,20 @@ import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
 import { firebase } from '../../firebase/firebase'
 import { dbRef, dbMovieRef, onceGetMovies } from '../../firebase/database'
+import { imgsRef } from '../../firebase/storage'
 
 class MovieForm extends Component {
   constructor (props) {
     super(props)
     
     this.state = {
-      list: []
+      list: [],
+      file: '',
+      imagePreviewURL: ''
     }
 
     this.submitForm = this.submitForm.bind(this)
+    this.loadPreview = this.loadPreview.bind(this)
   }
 
   submitForm (e) {
@@ -26,7 +30,34 @@ class MovieForm extends Component {
       comments: this.refs.comments.value.trim(),
       user: this.props.authUser.email
     }
+    let img = this.state.file
     dbRef.child('movies').push(infos)
+    console.log(img)
+    let fullPath = '/imagens/'+this.state.file.name
+    console.log(fullPath)
+    console.log(imgsRef.fullPath)
+    if (!!img) {
+      imgsRef.parent.child('imagens/').child(img.name).put(img).then((result) => {
+        console.log('Uploaded -> ', result)
+      }).catch((error) => {
+        console.log('Error -> ', error)
+      })
+    }
+  }
+  
+  loadPreview (e) {
+    e.preventDefault()
+    let imgPreview = new FileReader()
+    let file = e.target.files[0]
+    imgPreview.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePrevewURL: imgPreview.result
+      })
+    }
+    imgPreview.readAsDataURL(file)
+    console.log(e)
+    console.log(e.target.files[0])
   }
   
   render () {
@@ -70,6 +101,17 @@ class MovieForm extends Component {
               <textarea className='form-control' id='comments' rows='4' ref='comments'></textarea>
             </div>
           </div>
+          
+          <div className='form-group row'>
+            <label htmlFor='selectFile' className={style.colLabel}>Select File</label>
+            <div className={style.colInput}>
+              <input type='file' id='output' onChange={(e) => this.loadPreview(e)}/>
+              {!!this.state.file && 
+                <img id='output' src={this.state.imagePrevewURL} className='img-thumbnail' />
+              }
+            </div>
+          </div>
+          
           <div className='form-group'>
             <div className='row justify-content-md-around'>
               <button type='submit' className='btn btn-primary btn-lg col'>Submit</button>
