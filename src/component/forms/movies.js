@@ -3,7 +3,7 @@ import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
 import { firebase } from '../../firebase/firebase'
 import { dbRef, dbMovieRef, onceGetMovies } from '../../firebase/database'
-import { imgsRef } from '../../firebase/storage'
+import { storageRef } from '../../firebase/storage'
 
 class MovieForm extends Component {
   constructor (props) {
@@ -21,30 +21,18 @@ class MovieForm extends Component {
   }
 
   submitForm (e) {
-    e.preventDefault()
-    this.setState({ error: '' })
-    let Data = new Date()
-    let img = this.state.file
-    let fullPath = 'imagens/'+this.state.file.name
-    console.log(img)
-    console.log(fullPath)
-    console.log(imgsRef.fullPath)
-    if (!!img) {
+    /*if (!!img) {
       imgsRef.child(img.name).put(img).then((result) => {
         console.log('Uploaded -> ', result)
         console.log('bucket -> ', result.ref.bucket)
         console.log('fullPath -> ', result.ref.fullPath)
         let downloadPath = 'gs://'+result.ref.bucket+'/'+result.ref.fullPath
-        console.log(downloadPath)
-        let infos = {
-          date: Data.toLocaleDateString(),
-          name: this.refs.name.value.trim(),
-          category: this.refs.category.value.trim(),
-          situation: this.refs.situation.value.trim(),
-          comments: this.refs.comments.value.trim(),
-          user: this.props.authUser.email,
-          imgUrl: downloadPath
-        }
+        console.log('download path', downloadPath)
+        console.log('token', result.token)
+        console.log('bytes transferred', result.bytesTransferred)
+        console.log('metada', result.metadata)
+        console.log('state', result.state)
+        console.log('task', result.task)
         dbRef.child('movies').push(infos)
       }).catch((error) => {
         console.log('Error -> ', error)
@@ -52,7 +40,46 @@ class MovieForm extends Component {
           error: 'Error'
         })
       })
+    }*/
+    e.preventDefault()
+    this.setState({ error: '' })
+    let Data = new Date()
+    let img = this.state.file
+    let imgUrl
+    let key
+    let infos = {
+      date: Data.toLocaleDateString(),
+      name: this.refs.name.value.trim(),
+      category: this.refs.category.value.trim(),
+      situation: this.refs.situation.value.trim(),
+      comments: this.refs.comments.value.trim(),
+      user: this.props.authUser.email,
+      //imgUrl: downloadPath
     }
+    dbRef.child('movies').push(infos)
+      .then((data) => {
+        key = data.key
+        return key
+      })
+      .then(key => {
+        const extension = img.name.slice(img.name.lastIndexOf('.'))
+        let uploadTask = storageRef.child('movie-img/' + key + extension).put(img)
+        uploadTask.on('state_changed', (snapshot) => {
+            let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            console.log('upload is ' + progress + '% done')
+          }, (error) => {
+            console.log(error)
+          }, () => {
+            uploadTask.snapshot.ref.getDownloadURL()
+              .then((downloadUrl) => {
+                console.log('File avaliable at', downloadUrl)
+                dbRef.child('movies/' + key).update({ imgUrl: downloadUrl })
+              })
+          })
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
   
   loadPreview (e) {
@@ -169,11 +196,11 @@ class MovieList extends Component {
   }
   
   componentDidMount () {
-    this.setState({
-      isLoading: true
-    })
     console.log('component did mount')
     onceGetMovies().then(snapshot => {
+      this.setState({
+        isLoading: true
+      })
       let data = snapshot.val()
       let item = []
       console.log(data)
@@ -194,6 +221,11 @@ class MovieList extends Component {
         movieList: item
       })}
     )
+    .catch(error => {
+      this.setState({
+        error: error
+      })
+    })
     console.log(this.state.movieList)
   }
   
