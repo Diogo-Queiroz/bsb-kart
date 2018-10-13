@@ -9,7 +9,7 @@
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 253px;
   padding: 20px;
   color: white;
 }
@@ -45,4 +45,9 @@
   border: none;
   border-bottom: 1px solid #999;
   border-radius: 0;
+}
+
+.card-img-size {
+  max-height: 250px;
+  max-width: 100%;
 }

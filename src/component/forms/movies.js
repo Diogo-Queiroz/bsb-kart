@@ -173,6 +173,7 @@ class MovieList extends Component {
     }
     this.getMovieList = this.getMovieList.bind(this)
     this.toogleMovieList = this.toogleMovieList.bind(this)
+    this.checkUserInMovieList = this.checkUserInMovieList.bind(this)
   }
   
   getMovieList () {
@@ -195,6 +196,11 @@ class MovieList extends Component {
     })
   }
   
+  checkUserInMovieList (obj) {
+    //return obj.user === this.props.authUser.email
+    (obj.user === this.props.authUser.email) ? this.renderMovies : false
+  }
+
   componentDidMount () {
     console.log('component did mount')
     onceGetMovies().then(snapshot => {
@@ -203,19 +209,21 @@ class MovieList extends Component {
       })
       let data = snapshot.val()
       let item = []
-      console.log(data)
-      console.log(typeof(data))
-      console.log(Object.keys(data))
       Object.keys(data).forEach((key) => {
         console.log(key, data[key])
-        item.push({
-          name: data[key].name,
-          category: data[key].category,
-          situation: data[key].situation,
-          comments: data[key].comments,
-          imgUrl: (data[key].imgUrl) ? data[key].imgUrl : ''
-        })
-      })
+        console.log(key, data[key].user)
+        console.log(this.props.authUser.email)
+        console.log('são iguais?? ', data[key].user === this.props.authUser.email)
+        if (data[key].user === this.props.authUser.email) {
+          item.push({
+            name: data[key].name,
+            category: data[key].category,
+            situation: data[key].situation,
+            comments: data[key].comments,
+            user: data[key].user,
+            imgUrl: (data[key].imgUrl) ? data[key].imgUrl : ''
+          })
+        }})
       this.setState({
         isLoading: false,
         movieList: item
@@ -252,7 +260,7 @@ class MovieList extends Component {
     return (
       <div key={movies.name} className='col-sm-12 col-md-6 col-lg-4 col-xl-3' style={{marginBottom: 10 + 'px'}}>
         <div key={movies.name} className="card">
-          <img className="card-img-top" src={movies.imgUrl} alt="Card image cap" />
+          <img className="card-img-top card-img-size" src={movies.imgUrl} alt="Card image cap" />
           <div className="card-body">
             <h5 className="card-title">{movies.name}</h5>
             <p className="card-text">{movies.comments}</p>
@@ -277,8 +285,6 @@ class MovieList extends Component {
             this.state.movieList.map(this.renderMovies)
           }
         </div>
-        <button onClick={this.toogleMovieList}>Show/Hide MovieList</button>
-        <button onClick={this.getMovieList}>Refresh</button>
       </div>
     )
   }
@@ -298,7 +304,7 @@ const MoviesPage = () =>
           </div>
           <div className='col'></div>
         </div>
-        <MovieList />
+        <MovieList authUser={authUser}/>
       </div>
     }
   </AuthUserContext.Consumer>
