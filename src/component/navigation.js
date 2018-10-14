@@ -15,27 +15,40 @@ const Navigation = () =>
   </AuthUserContext.Consumer>
 
 const NavigationAuth = () =>
-  <nav className='navbar navbar-expand-sm navbar-dark bg-dark'>
+  <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark'>
     <Link className='navbar-brand mb-0 h1' to={routes.LANDING}>
       <img src={logo}
         width='30' height='30' 
         className='d-inline-block align-top' alt='logo bsb kart' />BSB Kart
     </Link>
-    <div className=''>
+    <div>
       <ul className='navigation'>
         <li>
-          <Link className='nav-item nav-link' to={routes.HOME}>Home</Link>
+          <Link className='nav-item nav-link' to={routes.HOME}>
+            Home
+          </Link>
         </li>
-        <li>
-          <Link className='nav-item nav-link' to={routes.ACCOUNT}>Account</Link>
-        </li>
-        <li>
-          <Link className='nav-item nav-link' to={routes.MOVIES}>Movies</Link>
+        <li className='dropdown'>
+          <a
+            className='nav-item nav-link'
+            href='#'
+            >
+              My Records
+          </a>
+          <div className='dropdown-content'>
+            <Link className='nav-item nav-link' to={routes.MOVIES}>Movie List</Link>
+          </div>
         </li>
       </ul>
     </div>
     <div className='right'>
       <ul className='navigation'>
+        <li>
+          <Link className='nav-item nav-link' to={routes.ACCOUNT}>
+            <span className='hide-small'>Account  </span>
+            <i className="fas fa-user"></i>
+          </Link>
+        </li>
         <li>
           <SignOutButton />
         </li>
