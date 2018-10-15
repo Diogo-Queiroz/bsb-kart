@@ -38,6 +38,7 @@ class MovieForm extends Component {
 
     this.submitForm = this.submitForm.bind(this)
     this.loadPreview = this.loadPreview.bind(this)
+    this.isUpdating = this.isUpdating.bind(this)
   }
 
   submitForm (e) {
@@ -110,15 +111,10 @@ class MovieForm extends Component {
     //console.log(e.target.files[0])
   }
   
-  componentDidMount () {
-    console.log('component did mount')
+  isUpdating () {
     console.log(this.props)
-    console.log(this.props.location)
-    // console.log(this.props.location.search)   props.location.search
-  }
-
-  componentWillMount () {
-    console.log('compo will mount')
+    console.log(this.props.props.location)
+    
     const query = this.props.props.location.search
     console.log(query)
     const id = query.slice(query.indexOf('=') + 1, query.length)
@@ -129,7 +125,11 @@ class MovieForm extends Component {
         const movie = snapshot.val()
         this.setState({
           name: movie.name,
-          comments: movie.comments
+          category: movie.category,
+          comments: movie.comments,
+          situation: movie.situation,
+          date: movie.date,
+          user: movie.user
         })
       })
       .catch((error) => {
@@ -143,8 +143,8 @@ class MovieForm extends Component {
       colInput: 'col-sm-9'
     }
     console.log('render')
-    console.log(this.props)
-    console.log(this.props.props.location)
+    this.isUpdating
+    
     return (
       <div className='row'>
           <div className='col'></div>
@@ -211,7 +211,12 @@ class MovieForm extends Component {
               
               <div className='form-group'>
                 <div className='row justify-content-md-around'>
-                  {(this.props.props.location === '') && <p>Has search id</p>}
+                  {(this.props.props.location.search !== '') && 
+                    <button type='button'
+                      className='btn btn-success btn-lg col'>
+                        Update
+                    </button>
+                  }
                   <button 
                     type='submit'
                     className='btn btn-primary btn-lg col'>
@@ -345,10 +350,10 @@ class MovieList extends Component {
             <p className="card-text">{movies.comments}</p>
             <p className="card-text">{movies.category} - {movies.situation}</p>
             <div className='row'>
-              <a href={'/movies/?id=' + movies.key}
+              <Link to={'/movies/?id=' + movies.key}
                 className="btn btn-primary col">
                   Edit
-              </a>
+              </Link>
               <a
                 onClick={() => this.deleteCurrentMovie(movies.key)}
                 className="btn btn-danger col">
