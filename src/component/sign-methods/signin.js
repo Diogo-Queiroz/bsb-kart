@@ -17,6 +17,7 @@ const SignInPage = ({ history }) =>
       <div className='col-sm-12 col-md-8 col-lg-6'>
       
         <SignInForm history={history} />
+        <hr />
         <GoogleLoginButton />
         <PasswordForgetLink />
         <SignUpLink />
@@ -115,9 +116,12 @@ class GoogleLoginButton extends Component {
 
   submitGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider()
+    const { history } = this.props
     firebase.auth().signInWithPopup(provider)
       .then((result) => {
         console.log(result)
+        this.setState({...INITIAL_STATE})
+        history.push(routes.HOME)
       })
       .catch((error) => {
         console.log(error)
@@ -125,13 +129,13 @@ class GoogleLoginButton extends Component {
   }
 
   render () {
-    const { googleprovider } = this.state
+    
     return (
       <button 
-        className='btn btn-default btn-lg col'
+        className='btn btn-default btn-lg btn-login'
         type='submit'
         onClick={this.submitGoogle}>
-          Login with Google
+          <i className='fab fa-google'></i>
       </button>
     )
   }

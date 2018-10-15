@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
 import { storageRef } from '../../firebase/storage'
@@ -6,7 +7,8 @@ import {
   dbRef,
   dbMovieRef,
   onceGetMovies,
-  getCurrentMovie
+  getCurrentMovie,
+  deleteMovie
 } from '../../firebase/database'
 
 const byProperKey = (propertyName, value) => () => ({
@@ -22,22 +24,24 @@ const INITIAL_STATE = {
   file: '',
   imagePrevewURL: '',
   error: '',
-  refreshList: false
+  refreshList: false,
+  isLoading: false,
+  movieList: [],
+  visibleList: false
 }
 
 class MovieForm extends Component {
   constructor (props) {
     super(props)
     
-    this.state = {
-      ...INITIAL_STATE
-    }
+    this.state = { ...INITIAL_STATE }
 
     this.submitForm = this.submitForm.bind(this)
     this.loadPreview = this.loadPreview.bind(this)
   }
 
   submitForm (e) {
+    console.log('submit form')
     e.preventDefault()
     this.setState({ error: '' })
     let Data = new Date()
@@ -87,6 +91,7 @@ class MovieForm extends Component {
   }
   
   loadPreview (e) {
+    console.log('load preview')
     e.preventDefault()
     let imgPreview = new FileReader()
     let file = e.target.files[0]
@@ -113,6 +118,7 @@ class MovieForm extends Component {
   }
 
   componentWillMount () {
+    console.log('compo will mount')
     const query = this.props.props.location.search
     console.log(query)
     const id = query.slice(query.indexOf('=') + 1, query.length)
@@ -138,7 +144,7 @@ class MovieForm extends Component {
     }
     console.log('render')
     console.log(this.props)
-    console.log(this.props.location)
+    console.log(this.props.props.location)
     return (
       <div className='row'>
           <div className='col'></div>
@@ -205,8 +211,17 @@ class MovieForm extends Component {
               
               <div className='form-group'>
                 <div className='row justify-content-md-around'>
-                  <button type='submit' className='btn btn-primary btn-lg col'>Submit</button>
-                  <button type='reset' className='btn btn-danger btn-lg col'>Cancel</button>
+                  {(this.props.props.location === '') && <p>Has search id</p>}
+                  <button 
+                    type='submit'
+                    className='btn btn-primary btn-lg col'>
+                      Submit
+                  </button>
+                  <button
+                    type='reset'
+                    className='btn btn-danger btn-lg col'>
+                      Cancel
+                  </button>
                 </div>
               </div>
               {!!this.state.error && <p>Erro, tente novamente...</p>}
@@ -223,13 +238,11 @@ class MovieList extends Component {
   constructor (props) {
     super(props)
     
-    this.state = {
-      isLoading: false,
-      movieList: [],
-      visibleList: false
-    }
+    this.state = { ...INITIAL_STATE }
+
     this.getMovieList = this.getMovieList.bind(this)
     this.getUserMovieList = this.getUserMovieList.bind(this)
+    this.deleteCurrentMovie = this.deleteCurrentMovie.bind(this)
   }
   
   getMovieList () {
@@ -252,7 +265,7 @@ class MovieList extends Component {
     })
   }
   
-  getUserMovieList (obj) {
+  getUserMovieList () {
     onceGetMovies().then(snapshot => {
       this.setState({
         isLoading: true
@@ -287,6 +300,27 @@ class MovieList extends Component {
     })
   }
 
+  deleteCurrentMovie (id) {
+    console.log('Call delete movie method on key, ', id)
+    deleteMovie(id)
+      .then((result) => {
+        console.log('sucess -> ', result)
+        this.getUserMovieList()
+      })
+      .catch((error) => {
+        console.log('error -> ', error)
+      })
+    /*getCurrentMovie(id).remove()
+      .then((result) => {
+        console.log(result)
+        this.getUserMovieList()
+      })
+      .catch((error) => {
+        console.log(error)
+      })*/
+    //console.log(id)
+  }
+
   componentDidMount () {
     //console.log('component did mount')
     this.getUserMovieList()
@@ -299,7 +333,7 @@ class MovieList extends Component {
       this.getUserMovieList()
     }
   }
-  
+
   renderMovies (movies) {
     //console.log(movies)
     return (
@@ -311,8 +345,15 @@ class MovieList extends Component {
             <p className="card-text">{movies.comments}</p>
             <p className="card-text">{movies.category} - {movies.situation}</p>
             <div className='row'>
-              <a href={'/movies/?id=' + movies.key} className="btn btn-primary col">Edit</a>
-              <a href="#" className="btn btn-danger col">Delete</a>
+              <a href={'/movies/?id=' + movies.key}
+                className="btn btn-primary col">
+                  Edit
+              </a>
+              <a
+                onClick={() => this.deleteCurrentMovie(movies.key)}
+                className="btn btn-danger col">
+                  Delete
+              </a>
             </div>
           </div>
         </div>
@@ -327,7 +368,7 @@ class MovieList extends Component {
         {this.state.isLoading && <p>Carregando, aguarde...</p>}
         <div className='row'>
           {(this.state.movieList.length !== 0 && !this.state.isLoading) &&
-            this.state.movieList.map(this.renderMovies)
+            this.state.movieList.map((movies) => this.renderMovies(movies))
           }
         </div>
       </div>
