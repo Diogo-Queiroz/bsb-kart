@@ -48,7 +48,7 @@ class SignUpForm extends Component {
       history
     } = this.props
 
-    auth.doCreateUserWithEmailAndPassword (email, passwordOne)
+    auth.doCreateUserWithEmailAndPassword (username, email, passwordOne)
       .then(authUser => {
         this.setState({...INITIAL_STATE})
         history.push(routes.HOME)
@@ -87,7 +87,7 @@ class SignUpForm extends Component {
         </div>
         <div className='form-group'>
           <label htmlFor='email'>E-mail:</label>
-          <input type='email' id='email'
+          <input type='text' id='email'
             className='form-control' placeholder='email'
             value={email} onChange={event => this.setState(byPropKey('email',
               event.target.value

@@ -1,8 +1,8 @@
 import { auth } from './firebase'
 
 // Sign Up Method
-export const doCreateUserWithEmailAndPassword = (email, password) =>
-  auth.createUserAndRetrieveDataWithEmailAndPassword(email, password)
+export const doCreateUserWithEmailAndPassword = (username, email, password) =>
+  auth.createUserAndRetrieveDataWithEmailAndPassword(username, email, password)
 
 // Sign In Method
 export const doSignInWithEmailAndPassword = (email, password) =>
