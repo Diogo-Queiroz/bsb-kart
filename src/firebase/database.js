@@ -8,4 +8,5 @@ export const deleteMovie = (id) => database.ref('/movies/'+id).remove()
 
 export const categoryRef = database.ref('/categories')
 export const getCategories = () => database.ref('categories').once('value')
+export const deleteCategory = (id) => database.ref('categories/'+id).remove()
 export const getSituations = () => database.ref('situations').once('value')

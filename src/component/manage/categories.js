@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { getCategories, categoryRef, dbRef } from '../../firebase/database'
+import {
+  getCategories,
+  categoryRef,
+  dbRef,
+  deleteCategory
+} from '../../firebase/database'
 import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
 
@@ -8,14 +13,18 @@ const byProperKey = (propertyName, value) => () => ({
   [propertyName]: value
 })
 
+const INITIAL_STATE = {
+  category: '',
+  refreshList: false,
+  categories: [],
+  isLoading: false
+}
+
 class CategoryForm extends Component {
   constructor (props) {
     super (props)
 
-    this.state = {
-      category: '',
-      refreshList: false
-    }
+    this.state = { ...INITIAL_STATE }
 
     this.submitForm = this.submitForm.bind(this)
   }
@@ -23,10 +32,9 @@ class CategoryForm extends Component {
   submitForm (e) {
     e.preventDefault()
     console.log('submiting')
-    let categoryName = {
-      name: this.refs.category.value.trim()
-    }
-    dbRef.child('categories').push(categoryName)
+    let categoryName = this.refs.category.value.trim()
+    let id = this.props.authUser.email
+    dbRef.child('categories').child(id).push(categoryName)
       .then((data) => {
         console.log(data.key)
         this.setState({
@@ -63,15 +71,15 @@ class CategoryForm extends Component {
             </div>
             
             <div className='form-group'>
-              <div className='row justify-content-md-around'>
+              <div className='row justify-content-around'>
                 <button
                   type='submit'
-                  className='btn btn-primary btn-lg col'>
+                  className='btn btn-primary btn-lg'>
                   Submit
                 </button>
                 <button
                   type='reset'
-                  className='btn btn-danger btn-lg col'>
+                  className='btn btn-danger btn-lg'>
                   Cancel
                 </button>
               </div>
@@ -81,7 +89,9 @@ class CategoryForm extends Component {
         </div>
         <div className='col-md-2 col-lg-3'></div>
         <div className='row'>
-          <CategoriesList authUser={this.props.authUser} refreshList={this.state.refreshList} />
+          <div className='col-lg-12'>
+            <CategoriesList authUser={this.props.authUser} refreshList={this.state.refreshList} />
+          </div>
         </div>
       </div>
     )
@@ -92,10 +102,8 @@ class CategoriesList extends Component {
   constructor (props) {
     super(props)
     
-    this.state = { categories: [], isLoading: false }
+    this.state = { ...INITIAL_STATE }
 
-    //this.getUserMovieList = this.getUserMovieList.bind(this)
-    //this.deleteCurrentMovie = this.deleteCurrentMovie.bind(this)
     this.getCategories = this.getCategories.bind(this)
   }
 
@@ -124,65 +132,23 @@ class CategoriesList extends Component {
       })
   }
 
-  /*getUserMovieList () {
-    onceGetMovies().then(snapshot => {
-      this.setState({
-        isLoading: true
-      })
-      let data = snapshot.val()
-      let item = []
-      Object.keys(data).forEach((key) => {
-        if (data[key].user === this.props.authUser.email) {
-          item.push({
-            key: key,
-            name: data[key].name,
-            category: data[key].category,
-            situation: data[key].situation,
-            comments: data[key].comments,
-            user: data[key].user,
-            imgUrl: (data[key].imgUrl) ? data[key].imgUrl : ''
-          })
-        }})
-      this.setState({
-        isLoading: false,
-        movieList: item
-      })}
-    )
-    .catch(error => {
-      this.setState({
-        error: error
-      })
-    })
-  }
-
-  deleteCurrentMovie (id) {
-    console.log('Call delete movie method on key, ', id)
-    deleteMovie(id)
+  deleteCategory (id) {
+    console.log('delete cat', id)
+    deleteCategory(id)
       .then((result) => {
-        console.log('sucess -> ', result)
-        this.getUserMovieList()
-      })
-      .catch((error) => {
-        console.log('error -> ', error)
-      })
-    /*getCurrentMovie(id).remove()
-      .then((result) => {
-        console.log(result)
-        this.getUserMovieList()
+        console.log('category deleted', id)
+        this.getCategories()
       })
       .catch((error) => {
         console.log(error)
-      })*/
-    //console.log(id)
-  //}
+      })
+  }
 
   componentDidMount () {
-    //console.log('component did mount')
     this.getCategories()
   }
   
   componentWillReceiveProps (props) {
-    //console.log('Component will receive this props -> ', props)
     const refreshList = this.props.refreshList
     if (props.refreshList !== refreshList) {
       this.getCategories()
@@ -192,8 +158,13 @@ class CategoriesList extends Component {
   renderCategories (categories) {
     console.log(categories)
     return (
-      <li key={categories.key}>
-        {categories.name}<button>Delete</button>
+      <li key={categories.key} className='list-group-item'>
+        <p className='text-center float-left'>{categories.name}</p>
+        <button
+          className='btn btn-default float-right'
+          onClick={() => this.deleteCategory(categories.key)}>
+            Delete
+        </button>
       </li>
     )
   }
@@ -202,8 +173,10 @@ class CategoriesList extends Component {
     return (
       <div>
         MovieList
-        {this.state.isLoading && <p>Carregando, aguarde...</p>}
-        <ul>
+        {(this.state.categories.length === 0 && this.state.isLoading) &&
+          this.state.isLoading && <p>Carregando, aguarde...</p>
+        }
+        <ul className='list-group'>
           {(this.state.categories.length !== 0 && !this.state.isLoading) &&
             this.state.categories.map((categories) => this.renderCategories(categories))
           }

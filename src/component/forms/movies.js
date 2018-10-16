@@ -121,8 +121,14 @@ class MovieForm extends Component {
         isLoading: true
       })
       let data = snapshot.val()
-      let category = []
+      let category = [{
+        key: '0',
+        name: 'Select Category'
+      }]
       Object.keys(data).forEach((key) => {
+        console.log('data[key]', data[key].name)
+        console.log('key', key)
+        console.log('data', data)
         category.push({
           key: key,
           name: data[key].name
@@ -138,10 +144,20 @@ class MovieForm extends Component {
   }
 
   componentDidMount () {
+    console.log('did mount')
     this.getCategories()
   }
 
+  RenderForm () {
+    <form>
+      <input type='text' value='test'/>  
+    </form>
+  }
+
   render () {
+    const { category } = this.state
+    console.log('render()', category)
+    console.log('render')
     const style = {
       colLabel: 'col-sm-3 col-form-label',
       colInput: 'col-sm-9'
@@ -170,13 +186,15 @@ class MovieForm extends Component {
                 <label htmlFor='category' className={style.colLabel}>Category</label>
                 <div className={style.colInput}>
                   <select className='form-control my-input-style' id='category' required ref='category'>
-                    <option value=''>Select a category</option>
-                    {console.log('render categorias', this.state.category)}
-                    {Object.keys(this.state.category).map((index) => {
-                      <option key={this.state.category[index].key}  value={this.state.category[index].name}>{this.state.category[index].name}</option>
-                    })}
-                    <option value='Action'>Action</option>
-                    <option value='Drama'>Drama</option>
+                    {!!this.state.category && console.log('render categorias', this.state.category)}
+                    {/*!!this.state.category && Object.keys(this.state.category).map((index) => {
+                      //console.log('inside map', this.state.category[index].name)
+                      <option value={this.state.category[index].name}>{this.state.category[index].name}</option>
+                    })*/
+                      category && category.map((item, index) => (
+                        <option key={item.key} value={item.name}>{item.name}</option>
+                      ))
+                    }
                   </select>
                 </div>
               </div>
@@ -290,24 +308,13 @@ class MovieList extends Component {
       .catch((error) => {
         console.log('error -> ', error)
       })
-    /*getCurrentMovie(id).remove()
-      .then((result) => {
-        console.log(result)
-        this.getUserMovieList()
-      })
-      .catch((error) => {
-        console.log(error)
-      })*/
-    //console.log(id)
   }
 
   componentDidMount () {
-    //console.log('component did mount')
     this.getUserMovieList()
   }
   
   componentWillReceiveProps (props) {
-    //console.log('Component will receive this props -> ', props)
     const refreshList = this.props.refreshList
     if (props.refreshList !== refreshList) {
       this.getUserMovieList()
@@ -315,7 +322,6 @@ class MovieList extends Component {
   }
 
   renderMovies (movies) {
-    //console.log(movies)
     return (
       <div key={movies.key} className='col-sm-12 col-md-6 col-lg-4 col-xl-3' style={{marginBottom: 10 + 'px'}}>
         <div key={movies.name} className="card">
