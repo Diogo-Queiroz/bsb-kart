@@ -6,3 +6,4 @@ export const ACCOUNT = '/account'
 export const PASS_FORGET = '/pass-forget'
 
 export const MOVIES = '/movies'
+export const MANAGE_CATEGORIES = '/categories'

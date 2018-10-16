@@ -8,9 +8,7 @@ import {
   dbMovieRef,
   onceGetMovies,
   getCurrentMovie,
-  deleteMovie,
-  getCategories,
-  getSituations
+  deleteMovie
 } from '../../firebase/database'
 
 const byProperKey = (propertyName, value) => () => ({
@@ -40,7 +38,7 @@ class MovieForm extends Component {
 
     this.submitForm = this.submitForm.bind(this)
     this.loadPreview = this.loadPreview.bind(this)
-    this.getCategories = this.getCategories.bind(this)
+    this.isUpdating = this.isUpdating.bind(this)
   }
 
   submitForm (e) {
@@ -113,32 +111,30 @@ class MovieForm extends Component {
     //console.log(e.target.files[0])
   }
   
-  
-  getCategories () {
-    console.log('get categories')
-    getCategories().then(snapshot => {
-      this.setState({
-        isLoading: true
-      })
-      let data = snapshot.val()
-      let category = []
-      Object.keys(data).forEach((key) => {
-        category.push({
-          key: key,
-          name: data[key].name
+  isUpdating () {
+    console.log(this.props)
+    console.log(this.props.props.location)
+    
+    const query = this.props.props.location.search
+    console.log(query)
+    const id = query.slice(query.indexOf('=') + 1, query.length)
+    console.log(id)
+    getCurrentMovie(id)
+      .then((snapshot) => {
+        console.log(snapshot.val())
+        const movie = snapshot.val()
+        this.setState({
+          name: movie.name,
+          category: movie.category,
+          comments: movie.comments,
+          situation: movie.situation,
+          date: movie.date,
+          user: movie.user
         })
       })
-      this.setState({
-        isLoading: false,
-        category: category
+      .catch((error) => {
+        console.log(error)
       })
-    }).catch(error => {
-      console.log(error)
-    })
-  }
-
-  componentDidMount () {
-    this.getCategories()
   }
 
   render () {
@@ -146,6 +142,8 @@ class MovieForm extends Component {
       colLabel: 'col-sm-3 col-form-label',
       colInput: 'col-sm-9'
     }
+    console.log('render')
+    this.isUpdating
     
     return (
       <div className='row'>
@@ -171,10 +169,6 @@ class MovieForm extends Component {
                 <div className={style.colInput}>
                   <select className='form-control my-input-style' id='category' required ref='category'>
                     <option value=''>Select a category</option>
-                    {console.log('render categorias', this.state.category)}
-                    {Object.keys(this.state.category).map((index) => {
-                      <option key={this.state.category[index].key}  value={this.state.category[index].name}>{this.state.category[index].name}</option>
-                    })}
                     <option value='Action'>Action</option>
                     <option value='Drama'>Drama</option>
                   </select>
@@ -217,6 +211,12 @@ class MovieForm extends Component {
               
               <div className='form-group'>
                 <div className='row justify-content-md-around'>
+                  {(this.props.props.location.search !== '') && 
+                    <button type='button'
+                      className='btn btn-success btn-lg col'>
+                        Update
+                    </button>
+                  }
                   <button 
                     type='submit'
                     className='btn btn-primary btn-lg col'>
@@ -245,10 +245,31 @@ class MovieList extends Component {
     
     this.state = { ...INITIAL_STATE }
 
+    this.getMovieList = this.getMovieList.bind(this)
     this.getUserMovieList = this.getUserMovieList.bind(this)
     this.deleteCurrentMovie = this.deleteCurrentMovie.bind(this)
   }
-
+  
+  getMovieList () {
+    let newMovies = []
+    dbMovieRef.on('child_added', (snapshot) => {
+      let data = snapshot.val()
+      //console.log(data)
+      let item = {
+        name: data.name,
+        category: data.category,
+        date: data.date,
+        situation: data.situation,
+        comments: data.comments,
+        imgUrl: data.imgUrl
+      }
+      newMovies.push(item)
+    })
+    this.setState({
+      movieList: newMovies
+    })
+  }
+  
   getUserMovieList () {
     onceGetMovies().then(snapshot => {
       this.setState({
@@ -257,6 +278,10 @@ class MovieList extends Component {
       let data = snapshot.val()
       let item = []
       Object.keys(data).forEach((key) => {
+        //console.log(key, data[key])
+        //console.log(key, data[key].user)
+        //console.log(this.props.authUser.email)
+        //console.log('são iguais?? ', data[key].user === this.props.authUser.email)
         if (data[key].user === this.props.authUser.email) {
           item.push({
             key: key,

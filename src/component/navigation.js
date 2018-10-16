@@ -15,7 +15,7 @@ const Navigation = () =>
   </AuthUserContext.Consumer>
 
 const NavigationAuth = () =>
-  <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark'>
+  <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark fixed-menu'>
     <Link className='navbar-brand mb-0 h1' to={routes.LANDING}>
       <img src={logo}
         width='30' height='30' 
@@ -39,6 +39,17 @@ const NavigationAuth = () =>
             <Link className='nav-item nav-link' to={routes.MOVIES}>Movie List</Link>
           </div>
         </li>
+        <li className='dropdown'>
+          <a
+            className='nav-item nav-link'
+            href='#'
+            >
+              Manager
+          </a>
+          <div className='dropdown-content'>
+            <Link className='nav-item nav-link' to={routes.MANAGE_CATEGORIES}>Categories</Link>
+          </div>
+        </li>
       </ul>
     </div>
     <div className='right'>
@@ -57,7 +68,7 @@ const NavigationAuth = () =>
   </nav>
   
 const NavigationNonAuth = () => 
-  <nav className='navbar navbar-expand-sm navbar-dark bg-dark'>
+  <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark fixed-menu'>
     <Link className='navbar-brand mb-0 h1' to={routes.LANDING}>
       <img src={logo}
         width='30' height='30' 
