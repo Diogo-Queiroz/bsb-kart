@@ -4,7 +4,8 @@ import {
   getCategories,
   categoryRef,
   dbRef,
-  deleteCategory
+  deleteCategory,
+  getUserCategory
 } from '../../firebase/database'
 import AuthUserContext from '../auth-user-context'
 import withAuthorization from '../withAuthorization'
@@ -33,8 +34,10 @@ class CategoryForm extends Component {
     e.preventDefault()
     console.log('submiting')
     let categoryName = this.refs.category.value.trim()
-    let id = this.props.authUser.email
-    dbRef.child('categories').child(id).push(categoryName)
+    let id = this.props.authUser.uid
+    console.log(this.props.authUser)
+    console.log(categoryName)
+    dbRef.child(`categories/${id}`).push(categoryName)
       .then((data) => {
         console.log(data.key)
         this.setState({
@@ -110,7 +113,7 @@ class CategoriesList extends Component {
   getCategories () {
     getCategories()
       .then(snapshot => {
-        console.log(snapshot.val())
+        console.log('get categories', snapshot.val())
         this.setState({
           isLoading: true
         })
@@ -135,7 +138,7 @@ class CategoriesList extends Component {
   deleteCategory (id) {
     console.log('delete cat', id)
     deleteCategory(id)
-      .then((result) => {
+      .then(() => {
         console.log('category deleted', id)
         this.getCategories()
       })
@@ -144,8 +147,19 @@ class CategoriesList extends Component {
       })
   }
 
+  getUserCategories (id) {
+    getUserCategory(id)
+      .then((result) => {
+        console.log('get user categories', result.val())
+        let data = result.val()
+        Object.keys(data).map((item) => console.log(data[item]))
+      })
+      .catch(error => console.log(error))
+  }
+
   componentDidMount () {
     this.getCategories()
+    this.getUserCategories(this.props.authUser.uid)
   }
   
   componentWillReceiveProps (props) {
@@ -156,7 +170,7 @@ class CategoriesList extends Component {
   }
 
   renderCategories (categories) {
-    console.log(categories)
+    console.log('render categories', categories)
     return (
       <li key={categories.key} className='list-group-item'>
         <p className='text-center float-left'>{categories.name}</p>

@@ -29,23 +29,23 @@ const NavigationAuth = () =>
           </Link>
         </li>
         <li className='dropdown'>
-          <a
+          <span
             className='nav-item nav-link'
             href='#'
             >
               My Records
-          </a>
+          </span>
           <div className='dropdown-content'>
             <Link className='nav-item nav-link' to={routes.MOVIES}>Movie List</Link>
           </div>
         </li>
         <li className='dropdown'>
-          <a
+          <span
             className='nav-item nav-link'
             href='#'
             >
               Manager
-          </a>
+          </span>
           <div className='dropdown-content'>
             <Link className='nav-item nav-link' to={routes.MANAGE_CATEGORIES}>Categories</Link>
           </div>

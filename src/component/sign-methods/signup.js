@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-import { auth } from '../../firebase'
+import { auth, database } from '../../firebase'
 import * as routes from '../../constants/routes'
 import { SignInLink } from './signin'
 
@@ -48,10 +48,18 @@ class SignUpForm extends Component {
       history
     } = this.props
 
-    auth.doCreateUserWithEmailAndPassword (username, email, passwordOne)
+    auth.doCreateUserWithEmailAndPassword (email, passwordOne)
       .then(authUser => {
-        this.setState({...INITIAL_STATE})
-        history.push(routes.HOME)
+        console.log(authUser)
+        database.doCreateUser(authUser.user.uid, username, email)
+          .then(() => {
+            console.log(authUser.user.uid)
+            this.setState(() => ({...INITIAL_STATE}))
+            history.push(routes.HOME)
+        })
+        .catch(error => {
+          this.setState(byPropKey('error', error))
+        })
       })
       .catch(error => {
         this.setState(byPropKey('error', error))

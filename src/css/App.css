@@ -59,6 +59,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
+  color: rgba(255, 255, 255, 0.5)
 }
 
 .dropdown-content {
