@@ -34,7 +34,8 @@ const INITIAL_STATE = {
   email: '',
   password: '',
   error: null,
-  provider: googleprovider
+  provider: googleprovider,
+  isLoading: false
 }
 
 class SignInForm extends Component {
@@ -54,7 +55,7 @@ class SignInForm extends Component {
 
     auth.doSignInWithEmailAndPassword(email, password)
       .then(() => {
-        this.setState({...INITIAL_STATE})
+        this.setState({...INITIAL_STATE, isLoading: true})
         history.push(routes.HOME)
       })
       .catch(error => {
@@ -66,7 +67,7 @@ class SignInForm extends Component {
 
   render () {
     const {
-      email, password, error
+      email, password, error, isLoading
     } = this.state
 
     const isInvalid = password === '' || email === ''
@@ -102,6 +103,7 @@ class SignInForm extends Component {
           </div>
         </div>
         { error && <p>{ error.message }</p>}
+        { isLoading && <p>Acessando, por favor aguarde...</p>}
       </form>
     )
   }
@@ -120,7 +122,7 @@ class GoogleLoginButton extends Component {
     firebase.auth().signInWithPopup(provider)
       .then((result) => {
         console.log(result)
-        this.setState({...INITIAL_STATE})
+        this.setState({...INITIAL_STATE, isLoading: true})
         history.push(routes.HOME)
       })
       .catch((error) => {

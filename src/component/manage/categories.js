@@ -37,7 +37,7 @@ class CategoryForm extends Component {
     let id = this.props.authUser.uid
     console.log(this.props.authUser)
     console.log(categoryName)
-    dbRef.child(`categories/${id}`).push(categoryName)
+    dbRef.child(`categories/${id}`).push({name: categoryName})
       .then((data) => {
         console.log(data.key)
         this.setState({
@@ -106,9 +106,10 @@ class CategoriesList extends Component {
     super(props)
     
     this.state = { ...INITIAL_STATE }
-
     this.getCategories = this.getCategories.bind(this)
   }
+
+  uid = this.props.authUser.uid
 
   getCategories () {
     getCategories()
@@ -134,38 +135,53 @@ class CategoriesList extends Component {
         console.log(error)
       })
   }
+  
+  getUserCategories (id) {
+    getUserCategory(id)
+      .then((result) => {
+        console.log('get user categories', result.val())
+        this.setState({
+          isLoading: true
+        })
+        let data = result.val()
+        let category = []
+        Object.keys(data).map((item) => {
+          console.log(data[item].name)
+          category.push({
+            key: item,
+            name: data[item].name
+          })
+        })
+        this.setState({
+          isLoading: false,
+          categories: category
+        })
+      })
+      .catch(error => console.log(error))
+  }
 
-  deleteCategory (id) {
+  deleteCategory (id, userId) {
     console.log('delete cat', id)
-    deleteCategory(id)
+    deleteCategory(id, userId)
       .then(() => {
-        console.log('category deleted', id)
-        this.getCategories()
+        console.log(`category deleted from user ${this.uid}, ${id}`)
+        this.getUserCategories(this.uid)
       })
       .catch((error) => {
         console.log(error)
       })
   }
 
-  getUserCategories (id) {
-    getUserCategory(id)
-      .then((result) => {
-        console.log('get user categories', result.val())
-        let data = result.val()
-        Object.keys(data).map((item) => console.log(data[item]))
-      })
-      .catch(error => console.log(error))
-  }
-
   componentDidMount () {
-    this.getCategories()
-    this.getUserCategories(this.props.authUser.uid)
+    //this.getCategories()
+    this.getUserCategories(this.uid)
   }
   
   componentWillReceiveProps (props) {
     const refreshList = this.props.refreshList
     if (props.refreshList !== refreshList) {
-      this.getCategories()
+      //this.getCategories()
+      this.getUserCategories(this.uid)
     }
   }
 
@@ -176,7 +192,7 @@ class CategoriesList extends Component {
         <p className='text-center float-left'>{categories.name}</p>
         <button
           className='btn btn-default float-right'
-          onClick={() => this.deleteCategory(categories.key)}>
+          onClick={() => this.deleteCategory(categories.key, this.uid)}>
             Delete
         </button>
       </li>
@@ -187,9 +203,7 @@ class CategoriesList extends Component {
     return (
       <div>
         MovieList
-        {(this.state.categories.length === 0 && this.state.isLoading) &&
-          this.state.isLoading && <p>Carregando, aguarde...</p>
-        }
+        {this.state.isLoading && <p>Carregando, aguarde...</p>}
         <ul className='list-group'>
           {(this.state.categories.length !== 0 && !this.state.isLoading) &&
             this.state.categories.map((categories) => this.renderCategories(categories))

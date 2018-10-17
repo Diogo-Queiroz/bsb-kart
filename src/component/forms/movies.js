@@ -10,6 +10,7 @@ import {
   getCurrentMovie,
   deleteMovie,
   getCategories,
+  getUserCategory,
   getSituations
 } from '../../firebase/database'
 
@@ -28,6 +29,7 @@ const INITIAL_STATE = {
   error: '',
   refreshList: false,
   isLoading: false,
+  isUploading: false,
   movieList: [],
   visibleList: false
 }
@@ -43,10 +45,12 @@ class MovieForm extends Component {
     this.getCategories = this.getCategories.bind(this)
   }
 
+  userId = this.props.authUser.uid
+
   submitForm (e) {
     console.log('submit form')
     e.preventDefault()
-    this.setState({ error: '' })
+    this.setState({ error: '', isUploading: true })
     let Data = new Date()
     let img = this.state.file
     let key
@@ -83,6 +87,7 @@ class MovieForm extends Component {
                 this.setState({
                   file: '',
                   imagePreviewURL: '',
+                  isUploading: false,
                   refreshList: !this.state.refreshList
                 })
               })
@@ -114,9 +119,30 @@ class MovieForm extends Component {
   }
   
   
-  getCategories () {
+  getCategories (id) {
     console.log('get categories')
-    getCategories().then(snapshot => {
+    getUserCategory(id)
+      .then(snapshot => {
+        this.setState({ isLoading: true })
+        let data = snapshot.val()
+        let category = [{
+          key: '0',
+          name: 'Select Category'
+        }]
+        console.log(data)
+        Object.keys(data).map(key => {
+          category.push({
+            key: key,
+            name: data[key].name
+          })
+        })
+        this.setState({
+          isLoading: false,
+          category: category
+        })
+      })
+      .catch(error => console.log(error))
+    /*getCategories().then(snapshot => {
       this.setState({
         isLoading: true
       })
@@ -140,12 +166,12 @@ class MovieForm extends Component {
       })
     }).catch(error => {
       console.log(error)
-    })
+    })*/
   }
 
   componentDidMount () {
     console.log('did mount')
-    this.getCategories()
+    this.getCategories(this.userId)
   }
 
   RenderForm () {
@@ -155,13 +181,26 @@ class MovieForm extends Component {
   }
 
   render () {
-    const { category } = this.state
-    console.log('render()', category)
-    console.log('render')
+    const {
+      name,
+      category,
+      isUploading,
+      comments,
+      imagePrevewURL,
+      refreshList
+    } = this.state
+    
+    const { 
+      authUser
+    } = this.props
+    
     const style = {
       colLabel: 'col-sm-3 col-form-label',
       colInput: 'col-sm-9'
     }
+    
+    console.log('render()', category)
+    console.log('render')
     
     return (
       <div className='row'>
@@ -175,7 +214,7 @@ class MovieForm extends Component {
                   <input type='text' id='name' 
                     className='form-control my-input-style'
                     placeholder='name of the movie'
-                    value={this.state.name} 
+                    value={name} 
                     onChange={event => this.setState(
                       byProperKey('name', event.target.value)
                     )}
@@ -186,7 +225,7 @@ class MovieForm extends Component {
                 <label htmlFor='category' className={style.colLabel}>Category</label>
                 <div className={style.colInput}>
                   <select className='form-control my-input-style' id='category' required ref='category'>
-                    {!!this.state.category && console.log('render categorias', this.state.category)}
+                    {!!category && console.log('render categorias', category)}
                     {/*!!this.state.category && Object.keys(this.state.category).map((index) => {
                       //console.log('inside map', this.state.category[index].name)
                       <option value={this.state.category[index].name}>{this.state.category[index].name}</option>
@@ -216,7 +255,7 @@ class MovieForm extends Component {
                     id='comments'
                     rows='4'
                     ref='comments'
-                    value={this.state.comments}
+                    value={comments}
                     onChange={event => this.setState(
                       byProperKey('comments', event.target.value)
                     )}></textarea>
@@ -228,7 +267,7 @@ class MovieForm extends Component {
                 <div className={style.colInput}>
                   <input type='file' id='output' onChange={(e) => this.loadPreview(e)} ref='img-file' required/>
                   {!!this.state.file && 
-                    <img id='output' src={this.state.imagePrevewURL} className='img-thumbnail' />
+                    <img id='output' src={imagePrevewURL} className='img-thumbnail' />
                   }
                 </div>
               </div>
@@ -237,7 +276,8 @@ class MovieForm extends Component {
                 <div className='row justify-content-md-around'>
                   <button 
                     type='submit'
-                    className='btn btn-primary btn-lg col'>
+                    className='btn btn-primary btn-lg col'
+                    disabled={isUploading}>
                       Submit
                   </button>
                   <button
@@ -251,7 +291,7 @@ class MovieForm extends Component {
             </form>
           </div>
           <div className='col'></div>
-        <MovieList authUser={this.props.authUser} refreshList={this.state.refreshList}/>
+        <MovieList authUser={authUser} refreshList={refreshList}/>
       </div>
     )
   }
