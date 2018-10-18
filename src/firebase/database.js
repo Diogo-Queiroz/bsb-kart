@@ -12,7 +12,13 @@ export const getCurrentMovie = (id) => database.ref('/movies/'+id).once('value')
 export const deleteMovie = (id) => database.ref('/movies/'+id).remove()
 
 export const categoryRef = database.ref('/categories')
+
 export const getCategories = () => database.ref('categories').once('value')
 export const getUserCategory = (id) => database.ref(`/categories/${id}`).once('value')
 export const deleteCategory = (id, userId) => database.ref(`categories/${userId}/${id}`).remove()
-export const getSituations = () => database.ref('situations').once('value')
+
+export const getUserSituation = (id) => database.ref(`/situations/${id}`).once('value')
+export const deleteSituation = (id, userId) => database.ref(`situations/${userId}/${id}`).remove()
+
+export const getUserChannel = (id) => database.ref(`/channels/${id}`).once('value')
+export const deleteChannel = (id, userId) => database.ref(`channels/${userId}/${id}`).remove()

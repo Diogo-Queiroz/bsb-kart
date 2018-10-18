@@ -1,5 +1,5 @@
 body {
-  padding-top: 80px;
+  padding-top: 120px;
 }
 
 .App {
@@ -90,6 +90,10 @@ body {
 
 .btn-login {
   border-radius: 50%;
+}
+
+.btn {
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5)
 }
 
 @media (max-width: 600px) {

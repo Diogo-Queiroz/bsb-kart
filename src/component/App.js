@@ -15,6 +15,8 @@ import PassForgetPage from './password-methods/pass-forget'
 
 import MoviesPage from './forms/movies'
 import CategoriesPage from './manage/categories'
+import SituationsPage from './manage/situations'
+import ChannelsPage from './manage/channels'
 
 import * as routes from '../constants/routes'
 
@@ -25,6 +27,8 @@ const App = () =>
         <Navigation />
         <Route exact path={routes.MOVIES} component={MoviesPage} />
         <Route exact path={routes.MANAGE_CATEGORIES} component={CategoriesPage} />
+        <Route exact path={routes.MANAGE_SITUATIONS} component={SituationsPage} />
+        <Route exact path={routes.MANAGE_CHANNEL} component={ChannelsPage} />
         <Route exact path={routes.HOME} component={HomePage} />
         <Route exact path={routes.ACCOUNT} component={AccountPage} />
         <Route exact path={routes.SIGN_UP} component={SignUpPage} />

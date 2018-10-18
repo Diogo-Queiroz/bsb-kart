@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
 import {
   getCategories,
-  categoryRef,
   dbRef,
   deleteCategory,
   getUserCategory
@@ -83,19 +81,16 @@ class CategoryForm extends Component {
                 <button
                   type='reset'
                   className='btn btn-danger btn-lg'>
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </div>
             {!!this.state.error && <p>Erro, tente novamente...</p>}
           </form>
+          <hr />
+          <CategoriesList authUser={this.props.authUser} refreshList={this.state.refreshList} />
         </div>
         <div className='col-md-2 col-lg-3'></div>
-        <div className='row'>
-          <div className='col-lg-12'>
-            <CategoriesList authUser={this.props.authUser} refreshList={this.state.refreshList} />
-          </div>
-        </div>
       </div>
     )
   }
@@ -188,27 +183,39 @@ class CategoriesList extends Component {
   renderCategories (categories) {
     console.log('render categories', categories)
     return (
-      <li key={categories.key} className='list-group-item'>
-        <p className='text-center float-left'>{categories.name}</p>
-        <button
-          className='btn btn-default float-right'
-          onClick={() => this.deleteCategory(categories.key, this.uid)}>
-            Delete
-        </button>
-      </li>
+      <tr key={categories.key}>
+        <td>{categories.name}</td>
+        <td>
+          <button
+            className='btn btn-default'
+            onClick={() => this.deleteCategory(categories.key, this.uid)}>
+              Deletar
+          </button>
+        </td>
+      </tr>
     )
   }
 
   render () {
     return (
       <div>
-        MovieList
+        <table className='table table-hover table-sm'>
+          <thead className='thead-light'>
+            <tr>
+              <th colSpan='2'>Category List</th>
+            </tr>
+            <tr>
+              <th scope='col'>Name</th>
+              <th scope='col'>Delete?</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(this.state.categories.length !== 0 && !this.state.isLoading) &&
+              this.state.categories.map((categories) => this.renderCategories(categories))
+            }
+          </tbody>
+        </table>
         {this.state.isLoading && <p>Carregando, aguarde...</p>}
-        <ul className='list-group'>
-          {(this.state.categories.length !== 0 && !this.state.isLoading) &&
-            this.state.categories.map((categories) => this.renderCategories(categories))
-          }
-        </ul>
       </div>
     )
   }
@@ -219,7 +226,7 @@ const CategoriesPage = (props) =>
   <AuthUserContext.Consumer>    
     { authUser => 
       <div className='container'>
-        <h1>Movies Page</h1>
+        <h1>Categories Page</h1>
         <CategoryForm authUser={authUser} props={props}/>
       </div>
     }

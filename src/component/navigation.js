@@ -48,6 +48,8 @@ const NavigationAuth = () =>
           </span>
           <div className='dropdown-content'>
             <Link className='nav-item nav-link' to={routes.MANAGE_CATEGORIES}>Categories</Link>
+            <Link className='nav-item nav-link' to={routes.MANAGE_SITUATIONS}>Situations</Link>
+            <Link className='nav-item nav-link' to={routes.MANAGE_CHANNEL}>Channels</Link>
           </div>
         </li>
       </ul>
