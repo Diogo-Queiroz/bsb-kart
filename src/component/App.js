@@ -14,9 +14,12 @@ import SignInPage from './sign-methods/signin'
 import PassForgetPage from './password-methods/pass-forget'
 
 import MoviesPage from './forms/movies'
+import UpdateMoviePage from './forms/update-movie'
 import CategoriesPage from './manage/categories'
 import SituationsPage from './manage/situations'
 import ChannelsPage from './manage/channels'
+import PlatformsPage from './manage/platforms'
+import ProgressPage from './manage/progress'
 
 import * as routes from '../constants/routes'
 
@@ -26,9 +29,12 @@ const App = () =>
       <div>
         <Navigation />
         <Route exact path={routes.MOVIES} component={MoviesPage} />
+        <Route exact path={routes.UPDATE_MOVIE} component={UpdateMoviePage} />
         <Route exact path={routes.MANAGE_CATEGORIES} component={CategoriesPage} />
         <Route exact path={routes.MANAGE_SITUATIONS} component={SituationsPage} />
         <Route exact path={routes.MANAGE_CHANNEL} component={ChannelsPage} />
+        <Route exact path={routes.MANAGE_PLATFORMS} component={PlatformsPage} />
+        <Route exact path={routes.MANAGE_PROGRESS} component={ProgressPage} />
         <Route exact path={routes.HOME} component={HomePage} />
         <Route exact path={routes.ACCOUNT} component={AccountPage} />
         <Route exact path={routes.SIGN_UP} component={SignUpPage} />

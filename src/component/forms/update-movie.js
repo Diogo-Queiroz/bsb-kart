@@ -10,6 +10,8 @@ import {
   getCurrentMovie,
   deleteMovie
 } from '../../firebase/database'
+import * as routes from '../../constants/routes'
+
 
 const byProperKey = (propertyName, value) => () => ({
   [propertyName]: value
@@ -19,6 +21,7 @@ const INITIAL_STATE = {
   name: '',
   category: '',
   situation: '',
+  channel: '',
   comments: '',
   list: [],
   file: '',
@@ -30,7 +33,7 @@ const INITIAL_STATE = {
   visibleList: false
 }
 
-class MovieForm extends Component {
+class UpdateMovieForm extends Component {
   constructor (props) {
     super(props)
     
@@ -38,10 +41,11 @@ class MovieForm extends Component {
 
     this.submitForm = this.submitForm.bind(this)
     this.loadPreview = this.loadPreview.bind(this)
-    this.isUpdating = this.isUpdating.bind(this)
   }
 
   submitForm (e) {
+    const { history } = this.props
+    
     console.log('submit form')
     e.preventDefault()
     this.setState({ error: '' })
@@ -72,7 +76,6 @@ class MovieForm extends Component {
           }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
               .then((downloadUrl) => {
-                //console.log('File avaliable at', downloadUrl)
                 dbRef.child('movies/' + key).update({ imgUrl: downloadUrl })
                 this.refs.name.value = ''
                 this.refs.category.value = ''
@@ -83,6 +86,7 @@ class MovieForm extends Component {
                   imagePreviewURL: '',
                   refreshList: !this.state.refreshList
                 })
+                history.push(routes.MOVIES)
               })
           })
       })
@@ -97,7 +101,6 @@ class MovieForm extends Component {
     let imgPreview = new FileReader()
     let file = e.target.files[0]
     if (!file) {
-      //console.log('Operation canceled')
       return
     }
     imgPreview.onloadend = () => {
@@ -107,37 +110,53 @@ class MovieForm extends Component {
       })
     }
     imgPreview.readAsDataURL(file)
-    //console.log(e)
-    //console.log(e.target.files[0])
   }
   
-  isUpdating () {
-    console.log(this.props)
-    console.log(this.props.props.location)
-    
-    const query = this.props.props.location.search
-    console.log(query)
-    const id = query.slice(query.indexOf('=') + 1, query.length)
-    console.log(id)
+  componentDidMount () {
+    const { search } = this.props.props.location
+    let id = search.slice(search.indexOf('=') + 1, search.length)
+    console.log('state', this.state)
+    console.log('this.props', this.props)
+    console.log('this.props.props', this.props.props)
+    console.log('this.props.props.location', this.props.props.location)
+    console.log('this.props.props.location.search', this.props.props.location.search)
+    console.log('this.props.props.location.search slice method', search.slice(search.indexOf('=') + 1, search.length))
     getCurrentMovie(id)
-      .then((snapshot) => {
+      .then(snapshot => {
         console.log(snapshot.val())
-        const movie = snapshot.val()
-        this.setState({
-          name: movie.name,
-          category: movie.category,
-          comments: movie.comments,
-          situation: movie.situation,
-          date: movie.date,
-          user: movie.user
-        })
+        let data = snapshot.val()
+        this.refs.name.value = data.name
+        this.refs.category.value = data.category
+        this.refs.comments.value = data.comments
+        this.refs.situation.value = data.situation
+        this.refs.channel.value = data.channel
+        //this.refs.imgFile.value = data.imgUrl
       })
-      .catch((error) => {
-        console.log(error)
-      })
+      .catch(error => console.log(error))
+  }
+
+  submitUpdateForm () {
+    const { history } = this.props
+    console.log('updating')
+    history.push(routes.MOVIES)
   }
 
   render () {
+    const {
+      name,
+      category,
+      situation,
+      channel,
+      isUploading,
+      comments,
+      imagePrevewURL,
+      refreshList
+    } = this.state
+    
+    const { 
+      authUser
+    } = this.props
+    
     const style = {
       colLabel: 'col-sm-3 col-form-label',
       colInput: 'col-sm-9'
@@ -150,14 +169,14 @@ class MovieForm extends Component {
           <div className='col'></div>
           <div className='col-sm-12 col-md-8 col-lg-6'>
             <p>This page is only visible from signed in users</p>
-            <form ref='form' onSubmit={this.submitForm}>
+            <form ref='form' onSubmit={this.submitUpdateForm}>
               <div className='form-group row'>
                 <label htmlFor='name' className={style.colLabel}>Movie Name</label>
                 <div className={style.colInput}>
                   <input type='text' id='name' 
                     className='form-control my-input-style'
                     placeholder='name of the movie'
-                    value={this.state.name} 
+                    value={name} 
                     onChange={event => this.setState(
                       byProperKey('name', event.target.value)
                     )}
@@ -168,22 +187,38 @@ class MovieForm extends Component {
                 <label htmlFor='category' className={style.colLabel}>Category</label>
                 <div className={style.colInput}>
                   <select className='form-control my-input-style' id='category' required ref='category'>
-                    <option value=''>Select a category</option>
-                    <option value='Action'>Action</option>
-                    <option value='Drama'>Drama</option>
+                    {!!category && console.log('render categorias', category)}
+                    {category && category.map((item) => (
+                        <option key={item.key} value={item.name}>{item.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
+              
               <div className='form-group row'>
                 <label htmlFor='situation' className={style.colLabel}>Situação:</label>
                 <div className={style.colInput}>
                   <select className='form-control my-input-style' id='situation' required ref='situation'>
-                    <option value=''>Select the status</option>
-                    <option value='watched'>Assistido</option>
-                    <option value='to watch'>Assistir</option>
+                    {!!situation && console.log('render situações', situation)}
+                    {situation && situation.map((item) => (
+                        <option key={item.key} value={item.name}>{item.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
+
+              <div className='form-group row'>
+                <label htmlFor='channel' className={style.colLabel}>Canal:</label>
+                <div className={style.colInput}>
+                  <select className='form-control my-input-style' id='situation' required ref='channel'>
+                    {!!channel && console.log('render channels', channel)}
+                    {channel && channel.map((item) => (
+                        <option key={item.key} value={item.name}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
               <div className='form-group row'>
                 <label htmlFor='comments' className={style.colLabel}>Comments:</label>
                 <div className={style.colInput}>
@@ -192,7 +227,7 @@ class MovieForm extends Component {
                     id='comments'
                     rows='4'
                     ref='comments'
-                    value={this.state.comments}
+                    value={comments}
                     onChange={event => this.setState(
                       byProperKey('comments', event.target.value)
                     )}></textarea>
@@ -202,29 +237,22 @@ class MovieForm extends Component {
               <div className='form-group row'>
                 <label htmlFor='selectFile' className={style.colLabel}>Select File</label>
                 <div className={style.colInput}>
-                  <input type='file' id='output' onChange={(e) => this.loadPreview(e)} ref='img-file' required/>
+                  <input type='file' id='output' onChange={(e) => this.loadPreview(e)} ref='imgFile' required/>
                   {!!this.state.file && 
-                    <img id='output' src={this.state.imagePrevewURL} className='img-thumbnail' />
+                    <img id='output' src={imagePrevewURL} className='img-thumbnail' />
                   }
                 </div>
               </div>
               
               <div className='form-group'>
-                <div className='row justify-content-md-around'>
-                  {(this.props.props.location.search !== '') && 
-                    <button type='button'
-                      className='btn btn-success btn-lg col'>
-                        Update
-                    </button>
-                  }
-                  <button 
-                    type='submit'
-                    className='btn btn-primary btn-lg col'>
-                      Submit
+                <div className='row justify-content-around'>
+                  <button type='submit'
+                    className='btn btn-success btn-lg'>
+                      Update
                   </button>
                   <button
                     type='reset'
-                    className='btn btn-danger btn-lg col'>
+                    className='btn btn-danger btn-lg'>
                       Cancel
                   </button>
                 </div>
@@ -233,165 +261,21 @@ class MovieForm extends Component {
             </form>
           </div>
           <div className='col'></div>
-        <MovieList authUser={this.props.authUser} refreshList={this.state.refreshList}/>
       </div>
     )
   }
 }
 
-class MovieList extends Component {
-  constructor (props) {
-    super(props)
-    
-    this.state = { ...INITIAL_STATE }
-
-    this.getMovieList = this.getMovieList.bind(this)
-    this.getUserMovieList = this.getUserMovieList.bind(this)
-    this.deleteCurrentMovie = this.deleteCurrentMovie.bind(this)
-  }
-  
-  getMovieList () {
-    let newMovies = []
-    dbMovieRef.on('child_added', (snapshot) => {
-      let data = snapshot.val()
-      //console.log(data)
-      let item = {
-        name: data.name,
-        category: data.category,
-        date: data.date,
-        situation: data.situation,
-        comments: data.comments,
-        imgUrl: data.imgUrl
-      }
-      newMovies.push(item)
-    })
-    this.setState({
-      movieList: newMovies
-    })
-  }
-  
-  getUserMovieList () {
-    onceGetMovies().then(snapshot => {
-      this.setState({
-        isLoading: true
-      })
-      let data = snapshot.val()
-      let item = []
-      Object.keys(data).forEach((key) => {
-        //console.log(key, data[key])
-        //console.log(key, data[key].user)
-        //console.log(this.props.authUser.email)
-        //console.log('são iguais?? ', data[key].user === this.props.authUser.email)
-        if (data[key].user === this.props.authUser.email) {
-          item.push({
-            key: key,
-            name: data[key].name,
-            category: data[key].category,
-            situation: data[key].situation,
-            comments: data[key].comments,
-            user: data[key].user,
-            imgUrl: (data[key].imgUrl) ? data[key].imgUrl : ''
-          })
-        }})
-      this.setState({
-        isLoading: false,
-        movieList: item
-      })}
-    )
-    .catch(error => {
-      this.setState({
-        error: error
-      })
-    })
-  }
-
-  deleteCurrentMovie (id) {
-    console.log('Call delete movie method on key, ', id)
-    deleteMovie(id)
-      .then((result) => {
-        console.log('sucess -> ', result)
-        this.getUserMovieList()
-      })
-      .catch((error) => {
-        console.log('error -> ', error)
-      })
-    /*getCurrentMovie(id).remove()
-      .then((result) => {
-        console.log(result)
-        this.getUserMovieList()
-      })
-      .catch((error) => {
-        console.log(error)
-      })*/
-    //console.log(id)
-  }
-
-  componentDidMount () {
-    //console.log('component did mount')
-    this.getUserMovieList()
-  }
-  
-  componentWillReceiveProps (props) {
-    //console.log('Component will receive this props -> ', props)
-    const refreshList = this.props.refreshList
-    if (props.refreshList !== refreshList) {
-      this.getUserMovieList()
-    }
-  }
-
-  renderMovies (movies) {
-    //console.log(movies)
-    return (
-      <div key={movies.key} className='col-sm-12 col-md-6 col-lg-4 col-xl-3' style={{marginBottom: 10 + 'px'}}>
-        <div key={movies.name} className="card">
-          <img className="card-img-top card-img-size" src={movies.imgUrl} alt="Card image cap" />
-          <div className="card-body">
-            <h5 className="card-title">{movies.name}</h5>
-            <p className="card-text">{movies.comments}</p>
-            <p className="card-text">{movies.category} - {movies.situation}</p>
-            <div className='row'>
-              <Link to={'/movies/?id=' + movies.key}
-                className="btn btn-primary col">
-                  Edit
-              </Link>
-              <a
-                onClick={() => this.deleteCurrentMovie(movies.key)}
-                className="btn btn-danger col">
-                  Delete
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  render () {
-    return (
-      <div>
-        MovieList
-        {this.state.isLoading && <p>Carregando, aguarde...</p>}
-        <div className='row'>
-          {(this.state.movieList.length !== 0 && !this.state.isLoading) &&
-            this.state.movieList.map((movies) => this.renderMovies(movies))
-          }
-        </div>
-      </div>
-    )
-  }
-  
-}
-
-const MoviesPage = (props) => 
+const UpdateMoviePage = (props) => 
   <AuthUserContext.Consumer>    
     { authUser => 
       <div className='container'>
-        <h1>Movies Page</h1>
-        <MovieForm authUser={authUser} props={props}/>
+        <h1>Update Movie Page</h1>
+        <UpdateMovieForm authUser={authUser} props={props}/>
       </div>
     }
   </AuthUserContext.Consumer>
 
 const authCondition = (authUser) => !!authUser
 
-export default withAuthorization(authCondition)(MoviesPage)
+export default withAuthorization(authCondition)(UpdateMoviePage)

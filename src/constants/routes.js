@@ -10,3 +10,7 @@ export const MOVIES = '/movies'
 export const MANAGE_CATEGORIES = '/categories'
 export const MANAGE_SITUATIONS = '/situations'
 export const MANAGE_CHANNEL = '/channels'
+export const MANAGE_PLATFORMS = '/platforms'
+export const MANAGE_PROGRESS = '/progress'
+
+export const UPDATE_MOVIE = '/update-movie'

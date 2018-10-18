@@ -22,3 +22,9 @@ export const deleteSituation = (id, userId) => database.ref(`situations/${userId
 
 export const getUserChannel = (id) => database.ref(`/channels/${id}`).once('value')
 export const deleteChannel = (id, userId) => database.ref(`channels/${userId}/${id}`).remove()
+
+export const getUserPlatform = (id) => database.ref(`/platforms/${id}`).once('value')
+export const deletePlatform = (id, userId) => database.ref(`platforms/${userId}/${id}`).remove()
+
+export const getUserProgress = (id) => database.ref(`/progresses/${id}`).once('value')
+export const deleteProgress = (id, userId) => database.ref(`progresses/${userId}/${id}`).remove()

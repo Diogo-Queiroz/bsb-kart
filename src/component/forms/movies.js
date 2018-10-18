@@ -412,10 +412,10 @@ class MovieList extends Component {
           <div className="card-body">
             <h5 className="card-title">{movies.name}</h5>
             <p className="card-text">{movies.comments}</p>
-            <h6 className='card-text'>Canal - {movies.channel}</h6>
+            {!!movies.channel && <p className='card-text'>Canal - {movies.channel}</p>}
             <p className="card-text">{movies.category} - {movies.situation}</p>
             <div className='row justify-content-around'>
-              <Link to={'/movies/?id=' + movies.key}
+              <Link to={'/update-movie/?id=' + movies.key}
                 className="btn btn-primary btn-lg">
                   Editar
               </Link>

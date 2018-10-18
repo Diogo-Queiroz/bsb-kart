@@ -50,6 +50,8 @@ const NavigationAuth = () =>
             <Link className='nav-item nav-link' to={routes.MANAGE_CATEGORIES}>Categories</Link>
             <Link className='nav-item nav-link' to={routes.MANAGE_SITUATIONS}>Situations</Link>
             <Link className='nav-item nav-link' to={routes.MANAGE_CHANNEL}>Channels</Link>
+            <Link className='nav-item nav-link' to={routes.MANAGE_PLATFORMS}>Platforms</Link>
+            <Link className='nav-item nav-link' to={routes.MANAGE_PROGRESS}>Progress</Link>
           </div>
         </li>
       </ul>
