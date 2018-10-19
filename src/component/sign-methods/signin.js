@@ -18,7 +18,7 @@ const SignInPage = ({ history }) =>
       
         <SignInForm history={history} />
         <hr />
-        <GoogleLoginButton />
+        <GoogleLoginButton history={history}/>
         <PasswordForgetLink />
         <SignUpLink />
       </div>
@@ -122,6 +122,7 @@ class GoogleLoginButton extends Component {
     firebase.auth().signInWithPopup(provider)
       .then((result) => {
         console.log(result)
+        console.log(history)
         this.setState({...INITIAL_STATE, isLoading: true})
         history.push(routes.HOME)
       })
