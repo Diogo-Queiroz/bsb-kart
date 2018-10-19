@@ -39,8 +39,14 @@ class RenderUsername extends Component {
 
   render () {
     const { username } = this.state
+    const { photoURL } = this.props.authUser.providerData[0]
     return (
-      <h1>Account Page: {username}</h1>
+      <div>
+        {!!photoURL && 
+          <img className='img-thumbnail' src={photoURL} />
+        }
+        <h1>Account Page: {username}</h1>
+      </div>
     )
   }
 }

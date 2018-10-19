@@ -17,9 +17,10 @@ const Navigation = () =>
 const NavigationAuth = () =>
   <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark fixed-menu'>
     <Link className='navbar-brand mb-0 h1' to={routes.LANDING}>
-      <img src={logo}
+      {/*<img src={logo}
         width='30' height='30' 
-        className='d-inline-block align-top' alt='logo bsb kart' />BSB Kart
+        className='d-inline-block align-top' alt='logo bsb kart' />*/}
+        <i className='fas fa-archive'></i>G.S.F.
     </Link>
     <div>
       <ul className='navigation'>
@@ -33,10 +34,18 @@ const NavigationAuth = () =>
             className='nav-item nav-link'
             href='#'
             >
-              My Records
+              Minhas Listas
           </span>
           <div className='dropdown-content'>
-            <Link className='nav-item nav-link' to={routes.MOVIES}>Movie List</Link>
+            <Link className='nav-item nav-link' to={routes.MOVIES}>
+              <i className='fas fa-video'></i>  Movies
+            </Link>
+            <Link className='nav-item nav-link' to={routes.MOVIES}>
+              <i className='fas fa-tv'></i>  Series
+            </Link>
+            <Link className='nav-item nav-link' to={routes.MOVIES}>
+              <i className='fas fa-gamepad'></i>  Games
+            </Link>
           </div>
         </li>
         <li className='dropdown'>
@@ -74,9 +83,10 @@ const NavigationAuth = () =>
 const NavigationNonAuth = () => 
   <nav id='navbar' className='navbar navbar-expand-sm navbar-dark bg-dark fixed-menu'>
     <Link className='navbar-brand mb-0 h1' to={routes.LANDING}>
-      <img src={logo}
+      {/*<img src={logo}
         width='30' height='30' 
-        className='d-inline-block align-top' alt='logo bsb kart' />BSB Kart
+        className='d-inline-block align-top' alt='logo bsb kart' />*/}
+        <i className='fas fa-archive'></i>G.S.F.
     </Link>
     <div className='right'>
       <ul className='navigation'>
