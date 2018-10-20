@@ -6,7 +6,7 @@ const SignOutButton = () =>
     className='btn'
     onClick={auth.doSignOut}
   >
-    <span className='hide-small'>Sign Out  </span>
+    <span className='hide-small'>Sair  </span>
     <i className='fas fa-sign-out-alt'></i>
   </button>
 

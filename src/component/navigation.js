@@ -53,7 +53,7 @@ const NavigationAuth = () =>
             className='nav-item nav-link'
             href='#'
             >
-              Manager
+              Gerenciar
           </span>
           <div className='dropdown-content'>
             <Link className='nav-item nav-link' to={routes.MANAGE_CATEGORIES}>Categories</Link>
@@ -69,7 +69,7 @@ const NavigationAuth = () =>
       <ul className='navigation'>
         <li>
           <Link className='nav-item nav-link' to={routes.ACCOUNT}>
-            <span className='hide-small'>Account  </span>
+            <span className='hide-small'>Perfil  </span>
             <i className="fas fa-user"></i>
           </Link>
         </li>
